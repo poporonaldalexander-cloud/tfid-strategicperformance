@@ -79,16 +79,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // resume session once users are loaded
-  useEffect(() => {
-    if (!ready || session.user) return;
-    const email = typeof window !== 'undefined' ? localStorage.getItem(SESS_KEY) : null;
-    if (email && db.app_users.length) {
-      const u = db.app_users.find((x) => x.email === email && x.status === 'Active');
-      if (u) applyUser(u);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready, db.app_users]);
+  // Sesi sengaja TIDAK dipulihkan otomatis dari localStorage,
+  // agar aplikasi selalu dibuka dari halaman login setiap kali diakses.
 
   function applyUser(u: AppUser) {
     const years = db.indicators.map((i) => i.year);
@@ -148,3 +140,4 @@ export function useYearInds(): Indicator[] {
   const { db, session } = useStore();
   return db.indicators.filter((i) => i.year === session.year && (!session.scope || i.acc_id === session.scope));
 }
+
