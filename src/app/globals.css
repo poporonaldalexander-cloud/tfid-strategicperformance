@@ -63,12 +63,12 @@ a{color:var(--green);text-decoration:none}
 .side-brand .txt .sub{font-size:9.5px;letter-spacing:1.4px;color:var(--gold);text-transform:uppercase;font-weight:700;margin-top:2px}
 .nav{padding:12px 12px;flex:1;overflow-y:auto}
 .nav .grp{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:#7fa394;padding:14px 12px 7px;font-weight:700}
-.nav button{display:flex;align-items:center;gap:11px;width:100%;padding:9px 12px;border-radius:9px;color:#cfe0d8;
+.nav a, .nav button{display:flex;align-items:center;gap:11px;width:100%;padding:9px 12px;border-radius:9px;color:#cfe0d8;text-decoration:none;
   font-size:13px;font-weight:600;text-align:left;transition:background .12s,color .12s;margin-bottom:2px}
-.nav button svg{width:17px;height:17px;flex:none;opacity:.85}
-.nav button:hover{background:rgba(255,255,255,.07);color:#fff}
-.nav button.active{background:var(--green);color:#fff}
-.nav button.active svg{opacity:1}
+.nav a svg, .nav button svg{width:17px;height:17px;flex:none;opacity:.85}
+.nav a:hover, .nav button:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav a.active, .nav button.active{background:var(--green);color:#fff}
+.nav a.active svg, .nav button.active svg{opacity:1}
 .side-foot{padding:14px;border-top:1px solid rgba(255,255,255,.09)}
 .user-chip{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.06)}
 .user-chip .av{width:32px;height:32px;border-radius:50%;background:var(--gold);color:#3a3318;font-weight:700;display:grid;place-items:center;font-size:13px;flex:none}
