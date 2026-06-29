@@ -71,3 +71,19 @@ export function qBars(i: Indicator) {
   }));
   return { bars, cur, target: tgt };
 }
+
+/* Quarterly mini sparkline (table column) — mirrors HTML's qSpark(): scaled to quarter values only, no target line */
+export function qSpark(i: Indicator) {
+  const qs: (number | null)[] = [i.q1 ?? null, i.q2 ?? null, i.q3 ?? null, i.q4 ?? null];
+  const nums = qs.filter((v): v is number => v != null);
+  if (!nums.length) return null;
+  const mx = Math.max(...nums, 0.0001);
+  let cur = -1;
+  for (let x = 3; x >= 0; x--) if (qs[x] != null) { cur = x; break; }
+  return qs.map((v, ix) => ({
+    h: v == null ? 0 : Math.max(2, Math.min((v / mx) * 100, 100)),
+    cur: ix === cur,
+    title: `Q${ix + 1}: ${v == null ? '—' : fmtVal(v, null, i.unit)}`,
+  }));
+}
+
