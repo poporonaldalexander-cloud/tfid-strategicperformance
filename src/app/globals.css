@@ -270,3 +270,41 @@ td .imeta{font-size:10.5px;color:var(--muted2);margin-top:3px}
   body{background:#fff}
   tbody tr{cursor:default}
 }
+
+/* ---------- LOGIN (split two-column, Strateva-style) ---------- */
+.login-split{position:fixed;inset:0;z-index:10;display:grid;grid-template-columns:1.05fr 1fr;background:var(--surface)}
+.login-split .ls-brand{position:relative;display:flex;flex-direction:column;justify-content:center;padding:48px 56px;color:#fff;
+  background:linear-gradient(150deg,var(--green-dark),var(--green) 60%,#0a7350);overflow:hidden}
+.login-split .ls-brand::before{content:"";position:absolute;inset:0;opacity:.12;
+  background-image:radial-gradient(circle at 18% 24%,#fff 0,transparent 38%),radial-gradient(circle at 88% 78%,var(--gold) 0,transparent 46%)}
+.ls-brand-inner{position:relative;max-width:440px}
+.ls-logo{width:84px;height:84px;border-radius:18px;overflow:hidden;background:rgba(255,255,255,.08);box-shadow:0 0 0 1px rgba(255,255,255,.16);margin-bottom:26px}
+.ls-logo img{width:100%;height:100%;object-fit:cover;display:block}
+.ls-brand h1{font-size:30px;font-weight:700;letter-spacing:-.3px;line-height:1.15}
+.ls-tag{margin-top:12px;font-size:14.5px;line-height:1.6;color:#dceae3;max-width:380px}
+.ls-pills{display:flex;flex-wrap:wrap;gap:9px;margin-top:24px}
+.ls-pills span{font-size:12px;font-weight:700;padding:7px 13px;border-radius:20px;background:rgba(255,255,255,.12);color:#eaf3ee;border:1px solid rgba(255,255,255,.16)}
+.ls-foot{position:absolute;left:56px;bottom:40px;font-size:12px;letter-spacing:1.4px;text-transform:uppercase;font-weight:700;color:var(--gold)}
+.login-split .ls-form{display:flex;align-items:center;justify-content:center;padding:40px}
+.ls-card{width:100%;max-width:380px}
+.ls-card h2{font-size:26px;font-weight:700;color:var(--ink);letter-spacing:-.3px}
+.ls-sub{color:var(--muted);font-size:13.5px;margin:6px 0 24px}
+.ls-error{background:var(--off-bg);border:1px solid #f2c9bd;color:#9c3a27;border-radius:10px;padding:11px 13px;font-size:12.5px;line-height:1.5;margin-bottom:18px}
+.ls-field{margin-bottom:16px}
+.ls-field>label{display:block;font-size:12.5px;font-weight:700;color:var(--ink);margin-bottom:7px}
+.ls-field input{width:100%;padding:12px 13px;border:1.5px solid var(--line);border-radius:10px;background:#fff;outline:none;font-size:14px;transition:border-color .15s,box-shadow .15s}
+.ls-field input:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--green-tint)}
+.ls-pwd{position:relative}
+.ls-pwd input{padding-right:104px}
+.ls-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:11.5px;font-weight:700;color:var(--green);padding:6px 9px;border-radius:7px}
+.ls-eye:hover{background:var(--green-tint)}
+.ls-btn{width:100%;margin-top:6px;background:var(--green);color:#fff;padding:13px;border-radius:10px;font-weight:700;font-size:14px;letter-spacing:.3px;transition:background .15s}
+.ls-btn:hover:not(:disabled){background:var(--green-dark)}
+.ls-btn:disabled{opacity:.55;cursor:not-allowed}
+.ls-hint{margin-top:18px;font-size:11.5px;color:var(--muted2);line-height:1.6;text-align:center}
+@media(max-width:860px){
+  .login-split{grid-template-columns:1fr}
+  .login-split .ls-brand{display:none}
+  .login-split .ls-form{padding:24px}
+}
+
