@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { ragOf, ragHex, pcolor } from '@/lib/bsc';
+import { ragOf, ragHex, pcolor, fmtVal } from '@/lib/bsc';
 import type { Indicator } from '@/lib/types';
 
 export const IC: Record<string, string> = {
@@ -19,12 +19,10 @@ export const IC: Record<string, string> = {
   x: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
 };
 
-export function Icon({ path, w = 2, size = 17, style }: { path: string; w?: number; size?: number; style?: React.CSSProperties }) {
+export function Icon({ path, w = 2, style }: { path: string; w?: number; style?: React.CSSProperties }) {
   return (
-    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth={w}
-      strokeLinecap="round" strokeLinejoin="round"
-      style={{ flexShrink: 0, ...style }}
-      dangerouslySetInnerHTML={{ __html: path }} />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={w} strokeLinecap="round" strokeLinejoin="round"
+      style={style} dangerouslySetInnerHTML={{ __html: path }} />
   );
 }
 
@@ -32,6 +30,29 @@ export function RagBadge({ i }: { i: Indicator }) {
   const r = ragOf(i);
   return (
     <span className={`badge b-${r.k}`}><span className="dot" />{r.label}</span>
+  );
+}
+
+export function QChart({ bars, cur, target, unit, year }: {
+  bars: { lbl: string; disp: string; h: number; cur: boolean }[];
+  cur: number; target: number | null; unit: string | null; year: number;
+}) {
+  return (
+    <>
+      <div className="qbars">
+        {bars.map((b, ix) => (
+          <div className="qbar" key={ix}>
+            <div className="qb-val">{b.disp}</div>
+            <div className="qb-track"><div className={`qb-fill${b.cur ? ' cur' : ''}`} style={{ height: `${b.h}%` }} /></div>
+            <div className="qb-lbl">{b.lbl}</div>
+          </div>
+        ))}
+      </div>
+      <div className="qb-cap">
+        {target != null && <span>Target {year}: <b>{fmtVal(target, null, unit)}</b></span>}
+        {cur >= 0 ? <span>Triwulan terisi terakhir: <b>Q{cur + 1}</b> (ditandai emas)</span> : <span className="muted">Belum ada data triwulanan</span>}
+      </div>
+    </>
   );
 }
 
@@ -128,3 +149,4 @@ export function csvCell(v: any) {
   if (/[",\n\r]/.test(v)) v = '"' + v.replace(/"/g, '""') + '"';
   return v;
 }
+
