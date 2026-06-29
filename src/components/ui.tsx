@@ -56,6 +56,17 @@ export function QChart({ bars, cur, target, unit, year }: {
   );
 }
 
+export function QSpark({ data }: { data: { h: number; cur: boolean; title: string }[] | null }) {
+  if (!data) return <span className="muted">—</span>;
+  return (
+    <span className="qspark" title="Q1–Q4">
+      {data.map((d, ix) => (
+        <i key={ix} className={d.cur ? 'cur' : ''} style={{ height: `${d.h}%` }} title={d.title} />
+      ))}
+    </span>
+  );
+}
+
 /* ---------- Charts ---------- */
 export function Donut({ data }: { data: [string, number, string][] }) {
   const total = data.reduce((a, d) => a + d[1], 0) || 1;
