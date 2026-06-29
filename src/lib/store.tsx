@@ -5,7 +5,6 @@ import type { DB, AppUser, AppRole, Indicator } from './types';
 import { appRoleOf, scopeOf } from './bsc';
 
 const EMPTY: DB = { strategy_map: [], outcomes: [], accountability: [], programs: [], app_users: [], indicators: [] };
-const SESS_KEY = 'tf_bsc_session_email';
 
 type Session = { user: AppUser | null; role: AppRole; scope: string | null; year: number };
 
@@ -15,8 +14,10 @@ type Store = {
   error: string | null;
   session: Session;
   ready: boolean;
-  login: (email: string) => void;
-  logout: () => void;
+  loggingIn: boolean;
+  loginError: string | null;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
   setYear: (y: number) => void;
   refresh: () => Promise<void>;
   // mutations
@@ -40,6 +41,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [session, setSession] = useState<Session>({ user: null, role: 'viewer', scope: null, year: 2026 });
+  const [loggingIn, setLoggingIn] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -70,32 +73,57 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // initial load + resume session
+  // initial load: fetch data, then resume Supabase Auth session if one exists
   useEffect(() => {
     (async () => {
       await refresh();
+      try {
+        const { data } = await supabase.auth.getSession();
+        const email = data.session?.user?.email;
+        if (email) {
+          const { data: row } = await supabase.from('app_users').select('*').eq('email', email).maybeSingle();
+          if (row && row.status === 'Active') applyUser(row as AppUser);
+          else await supabase.auth.signOut();
+        }
+      } catch { /* ignore */ }
       setReady(true);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Sesi sengaja TIDAK dipulihkan otomatis dari localStorage,
-  // agar aplikasi selalu dibuka dari halaman login setiap kali diakses.
-
   function applyUser(u: AppUser) {
     const years = db.indicators.map((i) => i.year);
     const year = years.length ? Math.max(...years) : new Date().getFullYear();
     setSession({ user: u, role: appRoleOf(u), scope: scopeOf(u), year });
-    if (typeof window !== 'undefined') localStorage.setItem(SESS_KEY, u.email);
   }
 
-  const login = (email: string) => {
-    const u = db.app_users.find((x) => x.email === email && x.status === 'Active');
-    if (u) applyUser(u);
+  // Login lewat Supabase Auth (email + password). Peran/akses diambil dari tabel app_users.
+  const login = async (email: string, password: string) => {
+    setLoggingIn(true);
+    setLoginError(null);
+    const em = email.trim().toLowerCase();
+    try {
+      const { error: authErr } = await supabase.auth.signInWithPassword({ email: em, password });
+      if (authErr) { setLoginError('Email atau kata sandi salah.'); return; }
+      // cari profil pengguna di app_users (untuk menentukan peran & cakupan)
+      const { data: row } = await supabase.from('app_users').select('*').eq('email', em).maybeSingle();
+      const u = row as AppUser | null;
+      if (!u || u.status !== 'Active') {
+        await supabase.auth.signOut();
+        setLoginError('Akun terverifikasi, tetapi email ini belum terdaftar sebagai pengguna aktif aplikasi. Hubungi administrator.');
+        return;
+      }
+      applyUser(u);
+    } catch (e: any) {
+      setLoginError(e.message || 'Gagal masuk. Coba lagi.');
+    } finally {
+      setLoggingIn(false);
+    }
   };
-  const logout = () => {
-    if (typeof window !== 'undefined') localStorage.removeItem(SESS_KEY);
+  const logout = async () => {
     setSession({ user: null, role: 'viewer', scope: null, year: session.year });
+    setLoginError(null);
+    try { await supabase.auth.signOut(); } catch { /* ignore */ }
   };
   const setYear = (y: number) => setSession((s) => ({ ...s, year: y }));
 
@@ -128,7 +156,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   };
 
   const value: Store = {
-    db, loading, error, session, ready,
+    db, loading, error, session, ready, loggingIn, loginError,
     login, logout, setYear, refresh,
     saveIndicator, deleteIndicator, saveUser, deleteUser, addOutcome,
   };
@@ -140,4 +168,5 @@ export function useYearInds(): Indicator[] {
   const { db, session } = useStore();
   return db.indicators.filter((i) => i.year === session.year && (!session.scope || i.acc_id === session.scope));
 }
+
 
