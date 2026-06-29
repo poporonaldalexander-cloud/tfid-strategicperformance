@@ -52,3 +52,22 @@ export function fmtVal(num: number | null, raw: string | null, unit: string | nu
   }
   return raw != null ? raw : '—';
 }
+
+/* Quarterly mini bar-chart helper — mirrors the HTML version's qChart() */
+export function qBars(i: Indicator) {
+  const qs: [string, number | null][] = [
+    ['Q1', i.q1 ?? null], ['Q2', i.q2 ?? null], ['Q3', i.q3 ?? null], ['Q4', i.q4 ?? null],
+  ];
+  const nums = qs.map((q) => q[1]).filter((v): v is number => v != null);
+  const tgt = i.target_year ?? null;
+  const maxV = Math.max(...nums, ...(tgt != null ? [tgt] : []), 0.0001);
+  let cur = -1;
+  for (let x = 3; x >= 0; x--) if (qs[x][1] != null) { cur = x; break; }
+  const bars = qs.map(([lbl, v], ix) => ({
+    lbl,
+    disp: v == null ? '—' : fmtVal(v, null, i.unit),
+    h: v == null ? 0 : Math.max(2, Math.min((v / maxV) * 100, 100)),
+    cur: ix === cur,
+  }));
+  return { bars, cur, target: tgt };
+}
