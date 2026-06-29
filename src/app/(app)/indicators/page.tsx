@@ -1,8 +1,8 @@
 'use client';
 import { useState, useMemo } from 'react';
 import { useStore, useYearInds } from '@/lib/store';
-import { ragOf, ragHex, fmtVal, pcolor, qBars } from '@/lib/bsc';
-import { Icon, IC, RagBadge, QChart } from '@/components/ui';
+import { ragOf, ragHex, fmtVal, pcolor, qBars, qSpark } from '@/lib/bsc';
+import { Icon, IC, RagBadge, QChart, QSpark } from '@/components/ui';
 import type { Indicator } from '@/lib/types';
 
 type Mini = null | { kind: 'year' | 'outcome'; a: string; b: string };
@@ -122,7 +122,7 @@ export default function IndicatorsPage() {
       <div className="tbl-wrap"><div className="tbl-scroll">
         {filtered.length ? (
           <table>
-            <thead><tr><th>Kode</th><th>Indikator</th><th>Unit / Akuntabilitas</th><th className="num">Target {session.year}</th><th className="num">Aktual</th><th className="num">Target 2030</th><th className="num" style={{ minWidth: 130 }}>Capaian</th><th>Status</th></tr></thead>
+            <thead><tr><th>Kode</th><th>Indikator</th><th>Unit / Akuntabilitas</th><th className="num">Target {session.year}</th><th className="num">Aktual</th><th>Triwulan</th><th className="num">Target 2030</th><th className="num" style={{ minWidth: 130 }}>Capaian</th><th>Status</th></tr></thead>
             <tbody>
               {filtered.map((i) => {
                 const rr = ragOf(i); const acc = accById(i.acc_id);
@@ -135,6 +135,7 @@ export default function IndicatorsPage() {
                     <td>{i.unit || '—'}<div className="imeta">{acc?.short}</div></td>
                     <td className="num">{fmtVal(i.target_year, i.target_year_raw, i.unit)}</td>
                     <td className="num">{fmtVal(i.actual, i.actual_raw, i.unit)}</td>
+                    <td><QSpark data={qSpark(i)} /></td>
                     <td className="num">{fmtVal(i.target_2030, i.target_2030_raw, i.unit)}</td>
                     <td className="num">{rr.ratio != null ? <><span className="mini-prog"><i style={{ width: `${(v / 1.5) * 100}%`, background: col }} /></span> {Math.round(rr.ratio * 100)}%</> : '—'}</td>
                     <td><RagBadge i={i} /></td>
